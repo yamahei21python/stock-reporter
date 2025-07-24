@@ -1,0 +1,39 @@
+name: Daily Stock Price Reporter
+
+# ワークフローの実行トリガー
+on:
+  # スケジュール実行
+  schedule:
+    # 日本時間の午前8時に毎日実行 (UTCでは前日の23時)
+    # 米国市場が閉まった後のタイミングです
+    - cron: '0 23 * * *'
+  
+  # 手動実行も可能にする
+  workflow_dispatch:
+
+jobs:
+  build-and-report:
+    runs-on: ubuntu-latest
+    steps:
+      # 1. リポジトリのコードをチェックアウト
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Python環境をセットアップ
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+
+      # 3. 必要なライブラリをインストール
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install yfinance requests
+
+      # 4. Pythonスクリプトを実行
+      - name: Run stock reporter script
+        env:
+          # GitHub SecretsからWebhook URLを環境変数として渡す
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: python stock_reporter.py
