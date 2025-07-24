@@ -19,7 +19,7 @@ def get_stock_data():
     all_tickers = [ticker for tickers in COMPANY_GROUPS.values() for ticker in tickers]
     
     # 過去3営業日分のデータを一括取得
-    data = yf.download(all_tickers, period="3d", progress=False, no_cache=True)
+    data = yf.download(all_tickers, period="3d", progress=False)
     
     if len(data['Close']) < 2:
         raise ValueError("2日分の取引データが取得できませんでした。市場が休場だった可能性があります。")
